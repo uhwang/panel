@@ -3,6 +3,12 @@
 import math
 import numpy as np
 
+
+spc_equal   = 0 # equal spacing
+spc_cos     = 1 # cosine spacing
+spc_hcos_le = 2 # half-cosine spacing at L.E.
+spc_hcos_te = 3 # half-cosine spacing at T.E.
+
 class InvalidNacaDigitException(Exception):
 	pass
 	
@@ -247,62 +253,15 @@ def adjpan(x, y, hnp):
 	
 	return hnp+hnp-1
 
-def test(dev):		
-	from vgl import symbol, color, symbol
-	from vgl import drawaxis, drawtick, drawlabel
-	naca_digit="4412"
-	npan = 100
-	npnt = npan+2
-	np1 = int(npan/2+1)
-	spc = 1
-	x=np.zeros((npnt),dtype=np.float32)
-	y=np.zeros((npnt),dtype=np.float32)
-	cam=np.zeros((npan),dtype=np.float32)
-	
-	naca45(naca_digit, x, y, np1, spc) #, cam)
-	adjpan(x, y, np1)
-	
-	w = open("%s.tec"%naca_digit, "wt")
-	w.write("variables = x,y\nzone t=\"NACA%s\", i = %d\n"%(naca_digit,x.size))
-	for i in range(npnt):
-		w.write("%f %f\n"%(x[i],y[i]))
-	w.close()
-	
-	drawaxis.draw_axis(dev)
-	drawtick.draw_tick_2d(dev)	
-	drawlabel.draw_label_2d(dev)
-
-	dev.polygon(x,y,color.BLUE, color.YELLOW, 0.001*dev.frm.hgt())
-	dev.polyline(x,y,color.BLACK,0.003*dev.frm.hgt())
-	#dev.polyline(x,cam,color.BLUE,0.003*dev.frm.hgt())
-	
-	sym = symbol.Circle(0.005, dev.frm.hgt(), 0.001)
-	dev.begin_symbol(sym)
-	for i in range(0,x.size): dev.symbol(x[i],y[i],sym)
-	dev.end_symbol()
-	
-def main():
-	from vgl import color, BBox, Frame, FrameManager, Data
-	from vgl import DeviceWindowsMetafile, DeviceCairo
-	#from vgl import drawfrm, symbol, drawtick, drawaxis, drawlabel
-	
-	data = Data(0,1.0,-0.5,0.5)
-	fmm = FrameManager()
-	frm_x2 = fmm.create(0.0,0.0,4,4, data)
-	
-	gbbox = fmm.get_gbbox()
-	dev_img = DeviceCairo("naca.png", gbbox, 100)
-	dev_img.fill_white()
-	dev_img.set_plot(frm_x2)
-	test(dev_img)
-	dev_img.close()
-	
-	dev_wmf = DeviceWindowsMetafile("naca.wmf", gbbox)
-	dev_wmf.set_device(frm_x2)
-	test(dev_wmf)
-	dev_wmf.close()
-	
-			
-if __name__ == '__main__':
-	main()
-
+def get_naca45(digit, npan, spc):
+    npan = 100
+    npnt = npan+2
+    np1 = int(npan/2+1)
+    x=np.zeros((npnt),dtype=np.float32)
+    y=np.zeros((npnt),dtype=np.float32)
+    
+    naca45(digit, x, y, np1, spc) #, cam)
+    adjpan(x, y, np1)
+    
+    return x,y
+    
