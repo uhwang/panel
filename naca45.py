@@ -254,7 +254,6 @@ def adjpan(x, y, hnp):
 	return hnp+hnp-1
 
 def get_naca45(digit, npan, spc):
-    npan = 100
     npnt = npan+2
     np1 = int(npan/2+1)
     x=np.zeros((npnt),dtype=np.float32)
